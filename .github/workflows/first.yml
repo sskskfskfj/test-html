@@ -2,7 +2,7 @@ name: my first github-action
 
 on: 
   push:
-    branches: [ "main" ] #main branch로 푸쉬되었을 때 실행
+    branches: [ "main" ]
 
 env:
   AWS_REGION: ap-northeast-2
@@ -19,5 +19,23 @@ jobs:
 
       - name: configure aws credential
         uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{secrets.AWS_ACCESS_KEY}}
+          aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          aws-region: ${{env.AWS_REGION}}
+
+      - name: ecr login
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: build, push docker image to ecr
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{steps.login-ecr.outputs.registry}}
+          REPOSITORY: ${{env.ECR_REPOSITORY}}
+          IMAGE_TAG: ${{ github.sha }}
+        run:
+          docker build -t $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG
 
         
