@@ -1,0 +1,23 @@
+name: my first github-action
+
+on: 
+  push:
+    branches: [ "main" ] #main branch로 푸쉬되었을 때 실행
+
+env:
+  AWS_REGION: ap-northeast-2
+  ECR_REPOSITORY: flask
+  
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: configure aws credential
+        uses: aws-actions/configure-aws-credentials@v4
+
+        
